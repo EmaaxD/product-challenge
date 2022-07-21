@@ -8,4 +8,9 @@ export default defineConfig({
     host: true,
     port: 3000,
   },
+  esbuild: {
+    define: {
+      this: "window",
+    },
+  },
 });
