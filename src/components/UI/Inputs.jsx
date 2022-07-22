@@ -10,6 +10,9 @@ import {
   FormControlLabel,
   Checkbox,
   useMediaQuery,
+  Rating,
+  Stack,
+  Typography,
 } from "@mui/material";
 import { makeStyles } from "@mui/styles";
 import { useTheme } from "@mui/material/styles";
@@ -164,6 +167,24 @@ export const MultipleSelect = ({
           ))}
         </Select>
       </FormControl>
+    </>
+  );
+};
+
+export const RatingInput = ({ value, onHandleChange }) => {
+  return (
+    <>
+      <Stack display="flex" width={200}>
+        <Typography component="legend">Calidad producto</Typography>
+        <Rating
+          name="rate"
+          value={value}
+          // precision={0.2}
+          onChange={(event, newValue) => {
+            onHandleChange(newValue);
+          }}
+        />
+      </Stack>
     </>
   );
 };

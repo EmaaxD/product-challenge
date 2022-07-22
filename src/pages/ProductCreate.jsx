@@ -3,11 +3,12 @@ import { useLocation } from "react-router-dom";
 import { makeStyles } from "@mui/styles";
 import Fade from "react-reveal/Fade";
 
+import { useForm } from "../hooks/useForm";
+
 import { MainTitle } from "../components/UI/Titles";
 import { MainContainer } from "../components/Containers/MainContainer";
 import { ContainerContent } from "../components/Containers/ContainerContent";
 import { FormProduct } from "../components/Containers/FormProduct";
-import { useForm } from "../hooks/useForm";
 
 const useStyles = makeStyles(() => ({
   productCreate: {
@@ -18,12 +19,11 @@ const useStyles = makeStyles(() => ({
 const initialState = {
   title: "",
   price: 0,
-  image:
-    "https://ih1.redbubble.net/image.1186321872.8871/ssrco,slim_fit_t_shirt,mens,101010:01c5ca27c6,front,square_product,600x600.jpg",
+  image: "",
   category: "",
   colors: [],
   sizes: [],
-  rate: "4.5",
+  rate: 3,
   description:
     "Lorem ipsum, dolor sit amet consectetur adipisicing elit. Iste provident amet atque, aperiam, quidem veniam nobis doloremque voluptatem officia quia dolorum quibusdam ut saepe aut eligendi ab architecto molestiae distinctio.",
   off: false,
@@ -38,9 +38,13 @@ export const ProductCreate = () => {
     error,
     form,
     success,
+    fileRef,
+    loadingcreate,
     handleChangeInputs,
+    handleChangeFile,
     handleChangeMultiSelect,
     handleChangeCheck,
+    handleChangeRating,
     handleSubmitCreate,
   } = useForm(initialState);
 
@@ -66,10 +70,14 @@ export const ProductCreate = () => {
                 <ContainerContent>
                   <FormProduct
                     form={form}
+                    fileRef={fileRef}
                     error={error}
                     success={success}
+                    loading={loadingcreate}
                     onHandleChangeInputs={handleChangeInputs}
+                    onHandleChangeFile={handleChangeFile}
                     onHandleChangeMultiSelect={handleChangeMultiSelect}
+                    onHandleChangeRating={handleChangeRating}
                     onHandleChangeCheck={handleChangeCheck}
                     onHandleSubmit={handleSubmitCreate}
                   />

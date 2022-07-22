@@ -21,8 +21,7 @@ const useStyles = makeStyles(() => ({
 const initialState = {
   title: "",
   price: 0,
-  image:
-    "https://ih1.redbubble.net/image.1186321872.8871/ssrco,slim_fit_t_shirt,mens,101010:01c5ca27c6,front,square_product,600x600.jpg",
+  image: "",
   category: "",
   colors: [],
   sizes: [],
@@ -40,13 +39,17 @@ export const ProductEdit = () => {
   const { id } = useParams();
 
   const {
+    loadingcreate,
     loading,
     error,
     form,
     success,
+    fileRef,
     handleChangeInputs,
+    handleChangeFile,
     handleChangeMultiSelect,
     handleChangeCheck,
+    handleChangeRating,
     handleSubmitEdit,
   } = useForm(initialState, id);
 
@@ -82,10 +85,14 @@ export const ProductEdit = () => {
                       <FormProduct
                         edit
                         form={form}
+                        fileRef={fileRef}
                         error={error}
                         success={success}
+                        loading={loadingcreate}
                         onHandleChangeInputs={handleChangeInputs}
+                        onHandleChangeFile={handleChangeFile}
                         onHandleChangeMultiSelect={handleChangeMultiSelect}
+                        onHandleChangeRating={handleChangeRating}
                         onHandleChangeCheck={handleChangeCheck}
                         onHandleSubmit={handleSubmitEdit}
                       />

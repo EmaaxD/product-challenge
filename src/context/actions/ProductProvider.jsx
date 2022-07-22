@@ -1,4 +1,6 @@
 import { createContext, useReducer, useEffect } from "react";
+import { doc, getDoc, setDoc, updateDoc } from "firebase/firestore";
+import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 
 import {
   PRODUCTS_SET,
@@ -12,7 +14,9 @@ import {
   REMOVE_PRODUCT,
   EDIT_PRODUCT,
 } from "../types";
+
 import { productReducer, initialState } from "../reducers/productReducer";
+import { firestore, storage } from "../../config/firebase";
 
 import { productMock } from "../../utils/productsMock";
 
@@ -23,35 +27,23 @@ export const ProductProvider = ({ children }) => {
 
   useEffect(() => {
     (async function () {
-      const products = JSON.parse(localStorage.getItem("products"));
-
-      if (products) {
-        dispatch({
-          type: PRODUCTS_SET,
-          payload: products,
-        });
-      } else {
-        if (state.products.length === 0) {
-          handleGetProducts();
-        }
+      if (state.products.length === 0) {
+        await handleGetProducts();
       }
     })();
   }, []);
 
-  useEffect(() => {
-    (function () {
-      localStorage.setItem("products", JSON.stringify(state.products));
-    })();
-  }, [state.products]);
-
   const handleGetProducts = async () => {
     try {
-      setTimeout(() => {
-        dispatch({
-          type: PRODUCTS_SET,
-          payload: productMock,
-        });
-      }, 3000);
+      const docRef = doc(firestore, "products/pWXf48Yr3lJWwtqdpJbD");
+      const data = await getDoc(docRef);
+      const products = data.data();
+      console.log("products", products);
+
+      dispatch({
+        type: PRODUCTS_SET,
+        payload: products.products,
+      });
     } catch (error) {
       console.log("error get products", error);
       dispatch({
@@ -70,17 +62,46 @@ export const ProductProvider = ({ children }) => {
     });
   };
 
-  const handleCreateProduct = (product) => {
+  const handleCreateProduct = async (product) => {
+    const docRef = doc(firestore, "products/pWXf48Yr3lJWwtqdpJbD");
+    const fileRef = ref(storage, `products/${product.image.name}`);
+
+    await uploadBytes(fileRef, product.image);
+    const url = await getDownloadURL(fileRef);
+
+    updateDoc(docRef, {
+      products: [...state.products, { ...product, image: url }],
+    });
+
     dispatch({
       type: CREATE_PRODUCT,
-      payload: product,
+      payload: { ...product, image: url },
     });
   };
 
-  const handleEditProduct = (product) => {
+  const handleEditProduct = async (product) => {
+    const docRef = doc(firestore, "products/pWXf48Yr3lJWwtqdpJbD");
+    let url = null;
+
+    if (typeof product?.image !== "string") {
+      const fileRef = ref(storage, `products/${product.image.name}`);
+      await uploadBytes(fileRef, product.image);
+      url = await getDownloadURL(fileRef);
+    }
+
+    const newProducts = state.products.map((item) =>
+      item.id === product.id
+        ? { ...item, ...product, image: url ? url : product.image }
+        : item
+    );
+
+    updateDoc(docRef, {
+      products: [...newProducts],
+    });
+
     dispatch({
       type: EDIT_PRODUCT,
-      payload: product,
+      payload: { ...product, image: url ? url : product.image },
     });
   };
 
@@ -127,9 +148,16 @@ export const ProductProvider = ({ children }) => {
   };
 
   const handleRemoveProduct = (idProduct) => {
-    const search = state.favoriteProducts.find((item) => item.id === idProduct);
+    const docRef = doc(firestore, "products/pWXf48Yr3lJWwtqdpJbD");
 
-    if (search) {
+    const searchFav = state.favoriteProducts.find(
+      (item) => item.id === idProduct
+    );
+    const searchShop = state.shoppingProducts.find(
+      (item) => item.id === idProduct
+    );
+
+    if (searchFav) {
       const products = state.favoriteProducts.filter(
         (item) => item.id !== idProduct
       );
@@ -140,7 +168,22 @@ export const ProductProvider = ({ children }) => {
       });
     }
 
+    if (searchShop) {
+      const products = state.favoriteProducts.filter(
+        (item) => item.id !== idProduct
+      );
+
+      dispatch({
+        type: REMOVE_SHOPPINGCART_PRO,
+        payload: products,
+      });
+    }
+
     const products = state.products.filter((item) => item.id !== idProduct);
+
+    updateDoc(docRef, {
+      products: [...products],
+    });
 
     dispatch({
       type: REMOVE_PRODUCT,

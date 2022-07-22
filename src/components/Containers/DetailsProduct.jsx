@@ -1,5 +1,5 @@
 import { useContext, useState, useEffect } from "react";
-import { Box, Typography, Stack } from "@mui/material";
+import { Box, Typography, Stack, Rating } from "@mui/material";
 
 import { productContext } from "../../context/actions/ProductProvider";
 
@@ -135,6 +135,17 @@ export const DetailsProduct = () => {
         <Typography variant="body1" color="GrayText">
           {selectedProduct?.description}
         </Typography>
+
+        <Stack
+          display="flex"
+          direction="row"
+          justifyContent="space-between"
+          alignItems="center"
+          my={2}
+        >
+          <Typography variant="body1">Calidad</Typography>
+          <Rating value={selectedProduct?.rate} readOnly />
+        </Stack>
 
         <Stack display="flex" spacing={1}>
           <Stack

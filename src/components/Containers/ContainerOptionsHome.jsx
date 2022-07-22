@@ -16,7 +16,13 @@ export const ContainerOptionsHome = () => {
 
   const navegation = useNavigate();
 
-  const { favoriteProducts, shoppingProducts } = useContext(productContext);
+  const { favoriteProducts, shoppingProducts, handleSelectedProduct } =
+    useContext(productContext);
+
+  const handleSelect = (idProduct) => {
+    handleSelectedProduct(idProduct);
+    navegation(`/product-details/${idProduct}`);
+  };
 
   return (
     <>
@@ -38,11 +44,13 @@ export const ContainerOptionsHome = () => {
           />
           <ButtonOptionHome
             title="Ver favoritos"
+            badge={favoriteProducts}
             icon={FavoriteIcon}
             onHandleClick={() => setMdlFav((c) => !c)}
           />
           <ButtonOptionHome
             title="Ver carrito"
+            badge={shoppingProducts}
             icon={ShoppingCartIcon}
             onHandleClick={() => setMdlShopp((c) => !c)}
           />
@@ -53,11 +61,13 @@ export const ContainerOptionsHome = () => {
         open={mdlfav}
         favorite
         options={favoriteProducts}
+        onHandleSelect={handleSelect}
         onHandleClose={() => setMdlFav((c) => !c)}
       />
       <MainModal
         open={mdlshopp}
         options={shoppingProducts}
+        onHandleSelect={handleSelect}
         onHandleClose={() => setMdlShopp((c) => !c)}
       />
     </>

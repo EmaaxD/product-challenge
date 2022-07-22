@@ -11,6 +11,7 @@ import {
   ToggleButtonGroup,
   ToggleButton,
   Hidden,
+  Badge,
 } from "@mui/material";
 import { useNavigate, useLocation } from "react-router-dom";
 import { makeStyles } from "@mui/styles";
@@ -329,7 +330,25 @@ export const ButtonSizesGroup = ({ value, sizes, onHandleChange }) => {
   );
 };
 
-export const ButtonOptionHome = ({ title, icon: Icon, onHandleClick }) => {
+export const ButtonOptionHome = ({
+  title,
+  badge,
+  icon: Icon,
+  onHandleClick,
+}) => {
+  if (badge)
+    return (
+      <>
+        <Tooltip title={title} arrow>
+          <IconButton size="small" onClick={onHandleClick}>
+            <Badge badgeContent={badge.length} sx={{ color: "white" }}>
+              <Icon style={{ color: "white" }} />
+            </Badge>
+          </IconButton>
+        </Tooltip>
+      </>
+    );
+
   return (
     <>
       <Tooltip title={title} arrow>

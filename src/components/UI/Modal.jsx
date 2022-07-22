@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   Fade,
   Modal,
@@ -42,6 +42,17 @@ const useStyles = makeStyles(() => ({
   containerImgModal: {
     width: 150,
     height: 100,
+
+    "& img": {
+      width: "100%",
+      height: "100%",
+      objectFit: "cover",
+      borderRadius: 6,
+    },
+  },
+  containerImgProduct: {
+    width: 500,
+    height: 400,
 
     "& img": {
       width: "100%",
@@ -173,8 +184,18 @@ export const ModalBuy = ({ open, productbuy, onHandleClose }) => {
   );
 };
 
-export const MainModal = ({ open, favorite, options, onHandleClose }) => {
+export const MainModal = ({
+  open,
+  favorite,
+  options,
+  onHandleSelect,
+  onHandleClose,
+}) => {
   const classes = useStyles();
+
+  useEffect(() => {
+    return () => onHandleClose();
+  }, []);
 
   return (
     <>
@@ -210,6 +231,8 @@ export const MainModal = ({ open, favorite, options, onHandleClose }) => {
                       display="flex"
                       direction="row"
                       spacing={2.5}
+                      onClick={() => onHandleSelect(item.id)}
+                      sx={{ cursor: "pointer" }}
                     >
                       <Box className={classes.containerImgModal}>
                         <img src={item.image} alt="image product" />
@@ -247,6 +270,38 @@ export const MainModal = ({ open, favorite, options, onHandleClose }) => {
                 </>
               )}
             </Stack>
+          </Box>
+        </Fade>
+      </Modal>
+    </>
+  );
+};
+
+export const ModalImageProduct = ({ open, image, onHandleClose }) => {
+  const classes = useStyles();
+
+  return (
+    <>
+      <Modal
+        aria-labelledby="transition-modal-title"
+        aria-describedby="transition-modal-description"
+        open={open}
+        onClose={onHandleClose}
+        closeAfterTransition
+        BackdropComponent={Backdrop}
+        BackdropProps={{
+          timeout: 500,
+        }}
+      >
+        <Fade in={open}>
+          <Box sx={style}>
+            <Typography variant="h6" textAlign="center">
+              Imagen a subir :D
+            </Typography>
+
+            <Box className={classes.containerImgProduct} mx="auto" mt={5}>
+              <img src={image} alt="image product" />
+            </Box>
           </Box>
         </Fade>
       </Modal>

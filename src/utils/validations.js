@@ -35,11 +35,11 @@ export const validationArray = (arr, type) =>
     }
   });
 
-export const validateQuantity = (str) => {
+export const validateQuantity = (str, limit = 106) => {
   let strSanitized = str;
 
-  if (str && str.length > 106) {
-    strSanitized = str.substring(0, 106) + "...";
+  if (str && str.length > limit) {
+    strSanitized = str.substring(0, limit) + "...";
   }
 
   return strSanitized;

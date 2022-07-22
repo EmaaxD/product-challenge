@@ -1,6 +1,6 @@
 import { useContext, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Stack, Box, Typography, Button, styled } from "@mui/material";
+import { Stack, Box, Typography, Button, styled, Rating } from "@mui/material";
 import { makeStyles } from "@mui/styles";
 import StarBorderIcon from "@mui/icons-material/StarBorder";
 import Fade from "react-reveal/Fade";
@@ -127,10 +127,7 @@ export const ProductCard = (props) => {
                 alignItems="center"
                 spacing={0.5}
               >
-                <StarBorderIcon style={{ color: "GrayText", fontSize: 14 }} />
-                <Typography fontSize={12} color="GrayText">
-                  {rate}
-                </Typography>
+                <Rating value={rate} readOnly />
               </Stack>
 
               <Button

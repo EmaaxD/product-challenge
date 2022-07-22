@@ -1,4 +1,4 @@
-import { useState, useContext, useEffect } from "react";
+import { useState, useContext, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 
 import { productContext } from "../context/actions/ProductProvider";
@@ -12,9 +12,12 @@ import {
 
 export const useForm = (initialState, edit) => {
   const [error, setError] = useState(null);
+  const [loadingcreate, setLoadingCreate] = useState(false);
   const [form, setForm] = useState(initialState);
   const [success, setSuccess] = useState(null);
   const [timer, setTimer] = useState(null);
+
+  const fileRef = useRef(null);
 
   const navegation = useNavigate();
 
@@ -35,12 +38,32 @@ export const useForm = (initialState, edit) => {
     }));
   };
 
+  const handleChangeFile = (e) => {
+    const reader = new FileReader();
+
+    if (e.target.files[0]) {
+      reader.readAsDataURL(e.target.files[0]);
+
+      reader.onload = (readerEvent) => {
+        setForm((c) => ({
+          ...c,
+          image: readerEvent.target.result,
+          nameFile: e.target.files[0].name,
+          file: e.target.files[0],
+        }));
+      };
+    }
+  };
+
   const handleChangeMultiSelect = ({ target: { name, value } }) => {
     setForm((c) => ({
       ...c,
       [name]: typeof value === "string" ? value.split(",") : value,
     }));
   };
+
+  const handleChangeRating = (rating) =>
+    setForm((c) => ({ ...c, rate: rating }));
 
   const handleChangeCheck = ({ target }) => {
     setForm((c) => ({
@@ -52,13 +75,13 @@ export const useForm = (initialState, edit) => {
   const handleSubmitCreate = async (e) => {
     e.preventDefault();
 
+    setLoadingCreate((c) => !c);
     setError(null);
 
     try {
       await validationString(form.title);
       await validationString(form.image);
       await validationString(form.category);
-      await validationString(form.rate);
       await validationString(form.description);
       await validationNumber(form.price);
       await validationArray(form.colors, "colors");
@@ -70,7 +93,8 @@ export const useForm = (initialState, edit) => {
         price: Number(form.price),
         off: form.off ? "25%" : false,
         codeOff: form.off ? "#MONHPY" : false,
-        image: form.image,
+        image: form.file,
+        nameFile: form.nameFile,
         colors: form.colors.map((item) => ({ value: item, text: item })),
         description: form.description,
         sizes: form.sizes.map((item) => ({
@@ -81,9 +105,10 @@ export const useForm = (initialState, edit) => {
         category: form.category,
       };
 
-      handleCreateProduct(product);
+      await handleCreateProduct(product);
       setSuccess("Producto creado correctamente");
       setForm(initialState);
+      setLoadingCreate((c) => !c);
 
       const timerSuccess = setTimeout(() => {
         setSuccess(null);
@@ -92,6 +117,7 @@ export const useForm = (initialState, edit) => {
       setTimer(timerSuccess);
     } catch (error) {
       console.log("error form", form);
+      setLoadingCreate((c) => !c);
       setError(error.message);
       const timerSuccess = setTimeout(() => {
         setError(null);
@@ -103,13 +129,13 @@ export const useForm = (initialState, edit) => {
   const handleSubmitEdit = async (e) => {
     e.preventDefault();
 
+    setLoadingCreate((c) => !c);
     setError(null);
 
     try {
       await validationString(form.title);
       await validationString(form.image);
       await validationString(form.category);
-      await validationString(form.rate);
       await validationString(form.description);
       await validationNumber(form.price);
       await validationArray(form.colors, "colors");
@@ -121,7 +147,8 @@ export const useForm = (initialState, edit) => {
         price: Number(form.price),
         off: form.off ? "25%" : false,
         codeOff: form.off ? "#MONHPY" : false,
-        image: form.image,
+        image: form.file ? form.file : selectedProduct.image,
+        nameFile: form.nameFile,
         colors: form.colors.map((item) => ({ value: item, text: item })),
         description: form.description,
         sizes: form.sizes.map((item) => ({
@@ -132,9 +159,10 @@ export const useForm = (initialState, edit) => {
         category: form.category,
       };
 
-      handleEditProduct(product);
+      await handleEditProduct(product);
 
       setSuccess("Producto editado correctamente");
+      setLoadingCreate((c) => !c);
 
       const timerSuccess = setTimeout(() => {
         setSuccess(null);
@@ -143,6 +171,7 @@ export const useForm = (initialState, edit) => {
       setTimer(timerSuccess);
     } catch (error) {
       console.log("error form", form);
+      setLoadingCreate((c) => !c);
       setError(error.message);
       const timerSuccess = setTimeout(() => {
         setError(null);
@@ -185,8 +214,12 @@ export const useForm = (initialState, edit) => {
     loading,
     form,
     success,
+    loadingcreate,
+    fileRef,
     handleChangeInputs,
+    handleChangeFile,
     handleChangeMultiSelect,
+    handleChangeRating,
     handleChangeCheck,
     handleSubmitCreate,
     handleSubmitEdit,

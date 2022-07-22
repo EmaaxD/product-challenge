@@ -17,6 +17,7 @@ import {
 } from "../components/UI/Loadings";
 import { ContainerOptionsHome } from "../components/Containers/ContainerOptionsHome";
 import { LoginGoogle } from "../components/Containers/LoginGoogle";
+import { EmptyProducts } from "../components/UI/EmptyProducts";
 
 const useStyles = makeStyles(() => ({
   app: {
@@ -161,11 +162,19 @@ export const Home = () => {
                   </>
                 ) : (
                   <>
-                    {memoProducts.map((item) => (
-                      <Grid key={item.id} item xs={12} sm={6} md={4}>
-                        <ProductCard {...item} />
-                      </Grid>
-                    ))}
+                    {memoProducts.length > 0 ? (
+                      <>
+                        {memoProducts.map((item) => (
+                          <Grid key={item.id} item xs={12} sm={6} md={4}>
+                            <ProductCard {...item} />
+                          </Grid>
+                        ))}
+                      </>
+                    ) : (
+                      <>
+                        <EmptyProducts />
+                      </>
+                    )}
                   </>
                 )}
               </Grid>
